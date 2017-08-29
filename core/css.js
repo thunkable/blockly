@@ -275,7 +275,8 @@ Blockly.Css.CONTENT = [
   '.blocklyText {',
     'cursor: default;',
     'fill: #fff;',
-    'font-family: sans-serif;',
+    /* Note: Changed by Thunkable */
+    'font-family: "Source Sans Pro", Lato, sans-serif;',
     'font-size: 11pt;',
   '}',
 
@@ -395,6 +396,8 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.blocklyMainBackground {',
+    /* Note: Added by Thunkable */
+    'fill: #E8EAF8 !important;',
     'stroke-width: 1;',
     'stroke: #c6c6c6;',  /* Equates to #ddd due to border being off-pixel. */
   '}',
@@ -600,7 +603,10 @@ Blockly.Css.CONTENT = [
 
   '.blocklyTreeLabel {',
     'cursor: default;',
-    'font-family: sans-serif;',
+    /* Note: Changed by Thunkable */
+    'font-family: "Source Sans Pro", Lato, sans-serif;',
+    /* Note: Added by Thunkable */
+    'font-weight: 300;',
     'font-size: 16px;',
     'padding: 0 3px;',
     'vertical-align: middle;',
