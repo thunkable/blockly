@@ -74,14 +74,18 @@ Blockly.DRAG_STACK = true;
 /**
  * The richness of block colours, regardless of the hue.
  * Must be in the range of 0 (inclusive) to 1 (exclusive).
+ *
+ * Note: Changed by Thunkable
  */
-Blockly.HSV_SATURATION = 0.45;
+Blockly.HSV_SATURATION = 0.56;
 
 /**
  * The intensity of block colours, regardless of the hue.
  * Must be in the range of 0 (inclusive) to 1 (exclusive).
+ *
+ * Note: Changed by Thunkable
  */
-Blockly.HSV_VALUE = 0.65;
+Blockly.HSV_VALUE = 0.83;
 
 /**
  * Sprited icons and images.
