@@ -40,7 +40,7 @@ goog.require('Blockly.Blocks');
  * Should be the same as Blockly.Msg.VARIABLES_HUE.
  * @readonly
  */
-Blockly.Constants.Variables.HUE = 330;
+Blockly.Constants.Variables.HUE = "#D05F2D";
 /** @deprecated Use Blockly.Constants.Variables.HUE */
 Blockly.Blocks.variables.HUE = Blockly.Constants.Variables.HUE;
 
