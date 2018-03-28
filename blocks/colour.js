@@ -40,7 +40,7 @@ goog.require('Blockly.Blocks');
  * This should be the same as Blockly.Msg.COLOUR_HUE.
  * @readonly
  */
-Blockly.Constants.Colour.HUE = "#7D7D7D";
+Blockly.Constants.Colour.HUE = "#7F7F7F";
 /** @deprecated Use Blockly.Constants.Colour.HUE */
 Blockly.Blocks.colour.HUE = Blockly.Constants.Colour.HUE;
 

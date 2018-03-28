@@ -35,7 +35,7 @@ goog.require('Blockly.Blocks');
  * Should be the same as Blockly.Msg.TEXTS_HUE
  * @readonly
  */
-Blockly.Constants.Text.HUE = "#B32D5E";
+Blockly.Constants.Text.HUE = "#F99EA3";
 /** @deprecated Use Blockly.Constants.Text.HUE */
 Blockly.Blocks.texts.HUE = Blockly.Constants.Text.HUE;
 
