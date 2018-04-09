@@ -40,7 +40,7 @@ goog.require('Blockly.Blocks');
  * Should be the same as Blockly.Msg.LOOPS_HUE
  * @readonly
  */
-Blockly.Constants.Loops.HUE = "#FCBA5E";
+Blockly.Constants.Loops.HUE = "#F3AA44";
 /** @deprecated Use Blockly.Constants.Loops.HUE */
 Blockly.Blocks.loops.HUE = Blockly.Constants.Loops.HUE;
 
