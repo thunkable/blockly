@@ -84,7 +84,7 @@ Blockly.defineBlocksWithJsonArray([  // BEGIN JSON EXTRACT
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": "%{BKY_LOGIC_HUE}",
+    "colour": "%{BKY_LOOPS_HUE}",
     "helpUrl": "%{BKY_CONTROLS_IF_HELPURL}",
     "mutator": "controls_if_mutator",
     "extensions": ["controls_if_tooltip"]
@@ -234,7 +234,7 @@ Blockly.defineBlocksWithJsonArray([  // BEGIN JSON EXTRACT
       }
     ],
     "output": null,
-    "colour": "%{BKY_LOGIC_HUE}",
+    "colour": "%{BKY_LOOPS_HUE}",
     "tooltip": "%{BKY_LOGIC_TERNARY_TOOLTIP}",
     "helpUrl": "%{BKY_LOGIC_TERNARY_HELPURL}",
     "extensions": ["logic_ternary"]
@@ -248,7 +248,7 @@ Blockly.defineBlocksWithJsonArray([ // Mutator blocks. Do not extract.
     "message0": "%{BKY_CONTROLS_IF_IF_TITLE_IF}",
     "nextStatement": null,
     "enableContextMenu": false,
-    "colour": "%{BKY_LOGIC_HUE}",
+    "colour": "%{BKY_LOOPS_HUE}",
     "tooltip": "%{BKY_CONTROLS_IF_IF_TOOLTIP}"
   },
   // Block representing the else-if statement in the controls_if mutator.
@@ -258,7 +258,7 @@ Blockly.defineBlocksWithJsonArray([ // Mutator blocks. Do not extract.
     "previousStatement": null,
     "nextStatement": null,
     "enableContextMenu": false,
-    "colour": "%{BKY_LOGIC_HUE}",
+    "colour": "%{BKY_LOOPS_HUE}",
     "tooltip": "%{BKY_CONTROLS_IF_ELSEIF_TOOLTIP}"
   },
   // Block representing the else statement in the controls_if mutator.
@@ -267,7 +267,7 @@ Blockly.defineBlocksWithJsonArray([ // Mutator blocks. Do not extract.
     "message0": "%{BKY_CONTROLS_IF_ELSE_TITLE_ELSE}",
     "previousStatement": null,
     "enableContextMenu": false,
-    "colour": "%{BKY_LOGIC_HUE}",
+    "colour": "%{BKY_LOOPS_HUE}",
     "tooltip": "%{BKY_CONTROLS_IF_ELSE_TOOLTIP}"
   }
 ]);
