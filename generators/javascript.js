@@ -179,7 +179,8 @@ Blockly.JavaScript.finish = function(code) {
   delete Blockly.JavaScript.definitions_;
   delete Blockly.JavaScript.functionNames_;
   Blockly.JavaScript.variableDB_.reset();
-  return definitions.join('\n\n') + '\n\n\n' + code;
+  return definitions.join('\n\n') + '\n\n\n' + 
+   Blockly.JavaScript.getConvertUndefinedCode() + '\n\n\n' + code;
 };
 
 /**
@@ -314,4 +315,13 @@ Blockly.JavaScript.getAdjusted = function(block, atId, opt_delta, opt_negate,
     }
   }
   return at;
+};  
+
+Blockly.JavaScript.getConvertUndefinedCode = function() {
+  return `convertUndefinedToEmptyString = function(value) { return (value === undefined ? "" : value); }`;
+};
+
+Blockly.JavaScript.valueToCodeNoUndefined = function(block, name, outerOrder) {
+  let code = Blockly.JavaScript.valueToCode(block, name, outerOrder);
+  return `convertUndefinedToEmptyString(${code})`;
 };
