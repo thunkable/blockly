@@ -67,6 +67,8 @@ def main():
                       help='relative path to input keys file')
   parser.add_argument('--quiet', action='store_true', default=False,
                       help='do not write anything to standard output')
+  parser.add_argument('--allowTranslation', default=False, 
+                      help='provide alternative version of output files')
   parser.add_argument('files', nargs='+', help='input files')
   args = parser.parse_args()
   if not args.output_dir.endswith(os.path.sep):
@@ -117,16 +119,14 @@ def main():
       # Output file.
       outname = os.path.join(os.curdir, args.output_dir, target_lang + '.js')
       with codecs.open(outname, 'w', 'utf-8') as outfile:
-        outfile.write(
-            """// This file was automatically generated.  Do not modify.
-
-'use strict';
-
-goog.provide('Blockly.Msg.{0}');
-
-goog.require('Blockly.Msg');
-
-""".format(target_lang.replace('-', '.')))
+        outfile.write("""// This file was automatically generated.  Do not modify.\n\n""")
+        if not args.allowTranslation: 
+          outfile.write("""'use strict';\n\n""")
+        if args.allowTranslation: 
+          outfile.write("""const goog = window.goog;\nconst Blockly = window.Blockly;\n""")
+        outfile.write("""goog.provide('Blockly.Msg.{0}');\n\ngoog.require('Blockly.Msg');\n\n"""
+          .format(target_lang.replace('-', '.'))
+        )
         # For each key in the source language file, output the target value
         # if present; otherwise, output the source language value with a
         # warning comment.
