@@ -417,7 +417,7 @@ Blockly.Msg.LISTS_INDEX_OF_INPUT_IN_LIST = Blockly.Msg.LISTS_INLIST;
 Blockly.Msg.PROCEDURES_DEFRETURN_COMMENT = Blockly.Msg.PROCEDURES_DEFNORETURN_COMMENT;
 
 Blockly.Msg["MATH_HUE"] = "#6789CC";
-Blockly.Msg["LOOPS_HUE"] = "F#F3AA44";
+Blockly.Msg["LOOPS_HUE"] = "#F3AA44";
 Blockly.Msg["LISTS_HUE"] = "#76AFC9";
 Blockly.Msg["LOGIC_HUE"] = "#45B4A9";
 Blockly.Msg["VARIABLES_HUE"] = "#F87956";
