@@ -323,5 +323,5 @@ Blockly.JavaScript.getConvertUndefinedCode = function() {
 
 Blockly.JavaScript.valueToCodeNoUndefined = function(block, name, outerOrder) {
   let code = Blockly.JavaScript.valueToCode(block, name, outerOrder);
-  return `convertUndefinedToEmptyString(${code})`;
+  return `this.convertUndefinedToEmptyString(${code})`;
 };

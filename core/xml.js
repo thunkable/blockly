@@ -592,17 +592,20 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
           // interact with id's instead of names, update this so that we get
           // the variable based on id instead of textContent.
           var type = xmlChild.getAttribute('variableType') || '';
-          var variable = workspace.getVariable(text);
-          if (!variable) {
-            variable = workspace.createVariable(text, type,
-              xmlChild.getAttribute(id));
-          }
-          if (typeof(type) !== undefined && type !== null) {
-            if (type !== variable.type) {
-              throw Error('Serialized variable type with id \'' +
-                variable.getId() + '\' had type ' + variable.type + ', and ' +
-                'does not match variable field that references it: ' +
-                Blockly.Xml.domToText(xmlChild) + '.');
+          var variableScopePrefixes = ['APP', 'STORED', 'CLOUD'];
+          if (variableScopePrefixes.indexOf(text.substr(0, text.indexOf(':'))) == -1) {
+            var variable = workspace.getVariable(text);
+            if (!variable) {
+              variable = workspace.createVariable(text, type,
+                xmlChild.getAttribute(id));
+            }
+            if (typeof(type) !== undefined && type !== null) {
+              if (type !== variable.type) {
+                throw Error('Serialized variable type with id \'' +
+                  variable.getId() + '\' had type ' + variable.type + ', and ' +
+                  'does not match variable field that references it: ' +
+                  Blockly.Xml.domToText(xmlChild) + '.');
+              }
             }
           }
         }
