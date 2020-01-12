@@ -1,1 +1,10 @@
-{"MATH_HUE": "230", "LOOPS_HUE": "120", "LISTS_HUE": "260", "LOGIC_HUE": "210", "VARIABLES_HUE": "330", "TEXTS_HUE": "160", "PROCEDURES_HUE": "290", "COLOUR_HUE": "20"}
+{
+    "MATH_HUE":       "#6789CC", 
+    "LOOPS_HUE":      "#F3AA44", 
+    "LISTS_HUE":      "#76AFC9", 
+    "LOGIC_HUE":      "#45B4A9", 
+    "VARIABLES_HUE":  "#F87956", 
+    "TEXTS_HUE":      "#DF6078", 
+    "PROCEDURES_HUE": "#7560A4", 
+    "COLOUR_HUE":     "#7F7F7F"
+}
