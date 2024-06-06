@@ -323,8 +323,10 @@ function saveConnection(connection: Connection, doFullSerialization: boolean):
  */
 export function append(
     state: State, workspace: Workspace,
-    {recordUndo = false}: {recordUndo?: boolean} = {}): Block {
-  return appendInternal(state, workspace, {recordUndo});
+    {recordUndo = false}: {recordUndo?: boolean} = {},
+    warningHook: (workspace: Workspace, block: Block) => void = () => {}
+  ): Block {
+  return appendInternal(state, workspace, {recordUndo}, warningHook);
 }
 
 /**
@@ -350,7 +352,9 @@ export function appendInternal(
       parentConnection?: Connection,
       isShadow?: boolean,
       recordUndo?: boolean
-    } = {}): Block {
+    } = {},
+    warningHook: (workspace: Workspace, block: Block) => void = () => {}
+  ): Block {
   const prevRecordUndo = eventUtils.getRecordUndo();
   eventUtils.setRecordUndo(recordUndo);
   const existingGroup = eventUtils.getGroup();
@@ -360,6 +364,7 @@ export function appendInternal(
   eventUtils.disable();
 
   const block = appendPrivate(state, workspace, {parentConnection, isShadow});
+  warningHook(workspace, block);
 
   eventUtils.enable();
   eventUtils.fire(new (eventUtils.get(eventUtils.BLOCK_CREATE))(block));
