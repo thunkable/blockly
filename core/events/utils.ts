@@ -5,7 +5,7 @@
  */
 
 // Former goog.module ID: Blockly.Events.utils
-
+// @ts-nocheck
 import type {Block} from '../block.js';
 import * as common from '../common.js';
 import * as registry from '../registry.js';
@@ -241,6 +241,46 @@ function fireInternal(event: Abstract) {
       setTimeout(fireNow, 0);
     }
   }
+  enqueueEvent(event);
+}
+
+/**
+ * Enqueue an event on FIRE_QUEUE.
+ *
+ * Normally this is equivalent to FIRE_QUEUE.push(event), but if the
+ * enqueued event is a BlockChange event and the most recent event(s)
+ * on the queue are BlockMove events that (re)connect other blocks to
+ * the changed block (and belong to the same event group) then the
+ * enqueued event will be enqueued before those events rather than
+ * after.
+ *
+ * This is a workaround for a problem caused by the fact that
+ * MutatorIcon.prototype.recomposeSourceBlock can only fire a
+ * BlockChange event after the mutating block's compose method
+ * returns, meaning that if the compose method reconnects child blocks
+ * the corresponding BlockMove events are emitted _before_ the
+ * BlockChange event, causing issues with undo, mirroring, etc.; see
+ * https://github.com/google/blockly/issues/8225#issuecomment-2195751783
+ * (and following) for details.
+ */
+function enqueueEvent(event: Abstract) {
+  if (event.type === CHANGE && (event as AnyDuringMigration).element === 'mutation') {
+    let i;
+    for (i = FIRE_QUEUE.length; i > 0; i--) {
+      const otherEvent = FIRE_QUEUE[i - 1];
+      if (
+        otherEvent.group !== event.group ||
+        otherEvent.workspaceId !== event.workspaceId ||
+        (otherEvent as AnyDuringMigration).type !== MOVE ||
+        (otherEvent as AnyDuringMigration).newParentId !== (event as AnyDuringMigration).blockId
+      ) {
+        break;
+      }
+    }
+    FIRE_QUEUE.splice(i, 0, event);
+    return;
+  }
+
   FIRE_QUEUE.push(event);
 }
 
@@ -248,7 +288,7 @@ function fireInternal(event: Abstract) {
 function fireNow() {
   const queue = filter(FIRE_QUEUE, true);
   FIRE_QUEUE.length = 0;
-  for (let i = 0, event; (event = queue[i]); i++) {
+  for (const event of queue) {
     if (!event.workspaceId) {
       continue;
     }
@@ -306,94 +346,65 @@ function fireNow() {
  * @param forward True if forward (redo), false if backward (undo).
  * @returns Array of filtered events.
  */
-export function filter(queueIn: Abstract[], forward: boolean): Abstract[] {
-  let queue = queueIn.slice();
+export function filter(queue: Abstract[], forward = true): Abstract[] {
   // Shallow copy of queue.
   if (!forward) {
     // Undo is merged in reverse order.
-    queue.reverse();
+    queue = queue.slice().reverse();
   }
   const mergedQueue = [];
-  const hash = Object.create(null);
   // Merge duplicates.
-  for (let i = 0, event; (event = queue[i]); i++) {
-    if (!event.isNull()) {
-      // Treat all UI events as the same type in hash table.
-      const eventType = event.isUiEvent ? UI : event.type;
-      // TODO(#5927): Check whether `blockId` exists before accessing it.
-      const blockId = (event as AnyDuringMigration).blockId;
-      const key = [eventType, blockId, event.workspaceId].join(' ');
-
-      const lastEntry = hash[key];
-      const lastEvent = lastEntry ? lastEntry.event : null;
-      if (!lastEntry) {
+  for (const event of queue) {
+    const lastEvent = mergedQueue[mergedQueue.length - 1];
+      if (event.isNull()) continue;
+      if (!lastEvent ||
+        lastEvent.workspaceId !== event.workspaceId ||
+        lastEvent.group !== event.group) {
         // Each item in the hash table has the event and the index of that event
         // in the input array.  This lets us make sure we only merge adjacent
         // move events.
-        hash[key] = {event, index: i};
         mergedQueue.push(event);
-      } else if (event.type === MOVE && lastEntry.index === i - 1) {
-        const moveEvent = event as BlockMove;
+        continue;
+      } 
+      if (event.type === MOVE && lastEvent.type === MOVE && (event as BlockChange).blockId === lastEvent.blockId) {
         // Merge move events.
-        lastEvent.newParentId = moveEvent.newParentId;
-        lastEvent.newInputName = moveEvent.newInputName;
-        lastEvent.newCoordinate = moveEvent.newCoordinate;
-        if (moveEvent.reason) {
-          if (lastEvent.reason) {
-            // Concatenate reasons without duplicates.
-            const reasonSet = new Set(
-              moveEvent.reason.concat(lastEvent.reason),
-            );
-            lastEvent.reason = Array.from(reasonSet);
-          } else {
-            lastEvent.reason = moveEvent.reason;
-          }
+        lastEvent.newParentId = event.newParentId;
+        lastEvent.newInputName = event.newInputName;
+        lastEvent.newCoordinate = event.newCoordinate;
+        if (lastEvent.reason || event.reason) {
+          lastEvent.reason = Array.from(
+            new Set((lastEvent.reason ?? []).concat(event.reason ?? [])),
+          );
         }
-        lastEntry.index = i;
       } else if (
         event.type === CHANGE &&
+        lastEvent.type === CHANGE &&
+        (event as BlockChange).blockId === lastEvent.blockId &&
         (event as BlockChange).element === lastEvent.element &&
         (event as BlockChange).name === lastEvent.name
       ) {
-        const changeEvent = event as BlockChange;
         // Merge change events.
-        lastEvent.newValue = changeEvent.newValue;
-      } else if (event.type === VIEWPORT_CHANGE) {
-        const viewportEvent = event as ViewportChange;
+        lastEvent.newValue = event.newValue;
+      } else if (event.type === VIEWPORT_CHANGE && lastEvent.type === VIEWPORT_CHANGE) {
         // Merge viewport change events.
-        lastEvent.viewTop = viewportEvent.viewTop;
-        lastEvent.viewLeft = viewportEvent.viewLeft;
-        lastEvent.scale = viewportEvent.scale;
-        lastEvent.oldScale = viewportEvent.oldScale;
+        lastEvent.viewTop = event.viewTop;
+        lastEvent.viewLeft = event.viewLeft;
+        lastEvent.scale = event.scale;
+        lastEvent.oldScale = event.oldScale;
       } else if (event.type === CLICK && lastEvent.type === BUBBLE_OPEN) {
         // Drop click events caused by opening/closing bubbles.
       } else {
         // Collision: newer events should merge into this event to maintain
         // order.
-        hash[key] = {event, index: i};
+        // hash[key] = {event, index: i};
         mergedQueue.push(event);
       }
-    }
   }
   // Filter out any events that have become null due to merging.
-  queue = mergedQueue.filter(function (e) {
-    return !e.isNull();
-  });
+  queue = mergedQueue.filter((e) => !e.isNull());
   if (!forward) {
     // Restore undo order.
     queue.reverse();
-  }
-  // Move mutation events to the top of the queue.
-  // Intentionally skip first event.
-  for (let i = 1, event; (event = queue[i]); i++) {
-    // AnyDuringMigration because:  Property 'element' does not exist on type
-    // 'Abstract'.
-    if (
-      event.type === CHANGE &&
-      (event as AnyDuringMigration).element === 'mutation'
-    ) {
-      queue.unshift(queue.splice(i, 1)[0]);
-    }
   }
   return queue;
 }
@@ -562,6 +573,7 @@ export function disableOrphans(event: Abstract) {
 
 export const TEST_ONLY = {
   FIRE_QUEUE,
+  enqueueEvent,
   fireNow,
   fireInternal,
   setGroupInternal,

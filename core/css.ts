@@ -389,6 +389,7 @@ input[type=number] {
 }
 
 .blocklyVerticalMarker {
+  stroke: none;
   stroke-width: 3px;
   fill: rgba(255,255,255,.5);
   pointer-events: none;

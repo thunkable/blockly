@@ -371,8 +371,9 @@ export function append(
   state: State,
   workspace: Workspace,
   {recordUndo = false}: {recordUndo?: boolean} = {},
+  warningHook: (workspace: Workspace, block: Block) => void = () => {}
 ): Block {
-  const block = appendInternal(state, workspace, {recordUndo});
+  const block = appendInternal(state, workspace, {recordUndo}, warningHook);
   if (workspace.rendered) renderManagement.triggerQueuedRenders();
   return block;
 }
@@ -406,6 +407,7 @@ export function appendInternal(
     isShadow?: boolean;
     recordUndo?: boolean;
   } = {},
+  warningHook: (workspace: Workspace, block: Block) => void = () => {}
 ): Block {
   const prevRecordUndo = eventUtils.getRecordUndo();
   eventUtils.setRecordUndo(recordUndo);
@@ -417,7 +419,7 @@ export function appendInternal(
 
   let block;
   try {
-    block = appendPrivate(state, workspace, {parentConnection, isShadow});
+    block = appendPrivate(state, workspace, {parentConnection, isShadow, warningHook});
   } finally {
     eventUtils.enable();
   }
@@ -462,7 +464,8 @@ function appendPrivate(
   {
     parentConnection = undefined,
     isShadow = false,
-  }: {parentConnection?: Connection; isShadow?: boolean} = {},
+    warningHook = () => {}
+  }: {parentConnection?: Connection; isShadow?: boolean, warningHook?: (workspace: Workspace, block: Block) => void} = {},
 ): Block {
   if (!state['type']) {
     throw new MissingBlockType(state);
@@ -476,8 +479,9 @@ function appendPrivate(
   tryToConnectParent(parentConnection, block, state);
   loadIcons(block, state);
   loadFields(block, state);
-  loadInputBlocks(block, state);
+  loadInputBlocks(block, state, warningHook);
   loadNextBlocks(block, state);
+  warningHook(workspace, block);
   initBlock(block, workspace.rendered);
 
   return block;
@@ -662,7 +666,7 @@ function loadFields(block: Block, state: State) {
  * @param block The block to attach input blocks to.
  * @param state The state object to reference.
  */
-function loadInputBlocks(block: Block, state: State) {
+function loadInputBlocks(block: Block, state: State, warningHook: (workspace: Workspace, block: Block) => void) {
   if (!state['inputs']) {
     return;
   }
@@ -673,7 +677,7 @@ function loadInputBlocks(block: Block, state: State) {
     if (!input || !input.connection) {
       throw new MissingConnection(inputName, block, state);
     }
-    loadConnection(input.connection, state['inputs'][inputName]);
+    loadConnection(input.connection, state['inputs'][inputName], warningHook);
   }
 }
 
@@ -704,6 +708,7 @@ function loadNextBlocks(block: Block, state: State) {
 function loadConnection(
   connection: Connection,
   connectionState: ConnectionState,
+  warningHook: (workspace: Workspace, block: Block) => void = () => {}
 ) {
   if (connectionState['shadow']) {
     connection.setShadowState(connectionState['shadow']);
@@ -712,7 +717,7 @@ function loadConnection(
     appendPrivate(
       connectionState['block'],
       connection.getSourceBlock().workspace,
-      {parentConnection: connection},
+      {parentConnection: connection, isShadow: false, warningHook},
     );
   }
 }

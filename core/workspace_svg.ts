@@ -1325,6 +1325,7 @@ export class WorkspaceSvg extends Workspace implements IASTNodeLocationSvg {
    */
   paste(
     state: AnyDuringMigration | Element | DocumentFragment,
+    warningHook: (workspace: Workspace, block: Block) => void = () => {}
   ): ICopyable<ICopyData> | null {
     deprecation.warn(
       'Blockly.WorkspaceSvg.prototype.paste',
@@ -1348,7 +1349,7 @@ export class WorkspaceSvg extends Workspace implements IASTNodeLocationSvg {
     try {
       // Checks if this is JSON. JSON has a type property, while elements don't.
       if (state['type']) {
-        pastedThing = this.pasteBlock_(null, state as blocks.State);
+        pastedThing = this.pasteBlock_(null, state as blocks.State, warningHook);
       } else {
         const xmlBlock = state as Element;
         if (xmlBlock.tagName.toLowerCase() === 'comment') {
@@ -1373,6 +1374,7 @@ export class WorkspaceSvg extends Workspace implements IASTNodeLocationSvg {
   private pasteBlock_(
     xmlBlock: Element | null,
     jsonBlock: blocks.State | null,
+    warningHook: (workspace: Workspace, block: Block) => void = () => {}
   ): BlockSvg {
     eventUtils.disable();
     let block: BlockSvg;
@@ -1387,7 +1389,7 @@ export class WorkspaceSvg extends Workspace implements IASTNodeLocationSvg {
         }
         blockY = parseInt(xmlBlock.getAttribute('y') ?? '0');
       } else if (jsonBlock) {
-        block = blocks.append(jsonBlock, this) as BlockSvg;
+        block = blocks.append(jsonBlock, this, {}, warningHook) as BlockSvg;
         blockX = jsonBlock['x'] || 10;
         if (this.RTL) {
           blockX = this.getWidth() - blockX;
