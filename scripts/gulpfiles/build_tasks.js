@@ -121,7 +121,7 @@ const chunks = [
     files: ['generators/javascript.js', 'generators/javascript/**/*.js'],
     entry: 'generators/javascript.js',
     scriptExport: 'javascript',
-    scriptNamedExports: {'Blockly.JavaScript': 'javascriptGenerator'},
+    scriptNamedExports: {'Blockly.JavaScript': 'javascriptGenerator', 'Blockly.BlockJS': 'blockJSGenerator'},
   },
   {
     name: 'python',

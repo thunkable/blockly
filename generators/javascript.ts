@@ -31,6 +31,12 @@ export * from './javascript/javascript_generator.js';
  */
 export const javascriptGenerator = new JavascriptGenerator();
 
+/**
+ * BlockJS code generator instance.
+ * @type {!JavascriptGenerator}
+ */
+export const blockJSGenerator = new JavascriptGenerator('BlockJS');
+
 // Install per-block-type generator functions:
 const generators: typeof javascriptGenerator.forBlock = {
   ...colour,
@@ -45,4 +51,5 @@ const generators: typeof javascriptGenerator.forBlock = {
 };
 for (const name in generators) {
   javascriptGenerator.forBlock[name] = generators[name];
+  blockJSGenerator.forBlock[name] = generators[name];
 }
